@@ -24,4 +24,25 @@ Programs communicate via a **bidirectional named pipe (FIFO)** at `/tmp/thread_m
 | Commands validated before sending                            | ✅ Done                        | `is_valid_command()` and `is_number()` in Program A                           |
 | Threads tracked with metadata                                | ✅ Done                        | `ThreadArray[]` stores `id`, `type`, `active`, and `pthread_t`                |
 
+WORKFLOW: 
 
+     +------------------+                  +------------------+
+     |    Program A     | ---(command)---> |    Program B     |
+     | (Command Sender) |                  | (Thread Manager) |
+     +------------------+                  +------------------+
+                                                    |
+                                                    v
+                                 +---------------------------+
+                                 |   Manager Thread (B)      |
+                                 |  - Parses commands        |
+                                 |  - Creates/kills threads  |
+                                 |  - Lists thread status    |
+                                 +---------------------------+
+                                                    |
+                                                    v
+                                     +-------------------------+
+                                     |   Worker Threads        |
+                                     |  - Run tasks (e.g.,      |
+                                     |    count_to_1000)       |
+                                     |  - Update shared state  |
+                                     +-------------------------+
